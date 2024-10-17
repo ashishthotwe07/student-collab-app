@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Best Practices and Font Setup */
+
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px; /* Base font size */
+}
+
+body {
+  @apply font-sans text-gray-800; /* Applying Tailwind font class */
+  line-height: 1.5;
+  background-color: #f9fafb; /* Tailwind's gray-100 */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700; /* Bold for headings */
+}
+
+p {
+  margin-bottom: 1rem; /* Spacing for paragraphs */
+}
+.text-primary {
+  @apply text-purple-800; /* Primary text color using Lavender Mist */
+}
+
+.bg-primary {
+  @apply bg-purple-200 text-white; /* Primary background color using Lavender Mist */
+}
+
+.bg-accent {
+  background-color: #B2AC88; /* Sage Green */
+}
+
+.text-accent {
+  color: #B2AC88; /* Sage Green text */
+}
+
+/* Example Button Styles */
+.btn {
+  @apply inline-block px-4 py-2 font-medium text-white bg-purple-700 rounded hover:bg-purple-800; /* Button with Lavender Mist */
+}

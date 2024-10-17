@@ -4,6 +4,8 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser"; // Import cookie-parser
 import studentRouter from "./routes/student.routes.js";
+import groupRoutes from "./routes/group.routes.js";
+import membershiprouter from "./routes/groupmembership.routes.js";
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ connectDB();
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/student", studentRouter);
+app.use("/api/groups", groupRoutes);
+app.use("/api/groupsmembership", membershiprouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
