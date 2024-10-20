@@ -89,9 +89,8 @@ const groupSchema = new Schema({
   },
   groupType: {
     type: String,
-    enum: ["public", "private", "invite-only"],
-    required: true,
-    default: "private",
+    enum: ["public", "private"], // Only allows 'public' or 'private'
+    default: "public", // Default to public
   },
   inviteCode: {
     type: String,

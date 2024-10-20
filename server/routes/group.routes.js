@@ -51,13 +51,6 @@ router.put(
 // @access   Private (Admin)
 router.delete("/:id", authMiddleware, GroupController.deleteGroup);
 
-// @route    POST /api/groups/:id/invite
-// @desc     Regenerate invite code for the group
-// @access   Private (Admin)
-router.post(
-  "/:id/invite",
-  authMiddleware,
-  GroupController.regenerateInviteCode
-);
+
 
 export default router;

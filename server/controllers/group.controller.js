@@ -1,17 +1,25 @@
 import Group from "../models/group.model.js";
 import { validationResult } from "express-validator";
+import crypto from "crypto";
 
 class GroupController {
   // @route    POST /api/groups
   // @desc     Create a new group
   // @access   Private (Admin)
   async createGroup(req, res) {
-    const { name, description, groupType, settings } = req.body;
+    const { name, description, groupType, settings, privacy } = req.body;
 
     // Validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Validate privacy setting
+    if (!["public", "private"].includes(privacy)) {
+      return res
+        .status(400)
+        .json({ msg: "Privacy must be either public or private." });
     }
 
     try {
@@ -20,6 +28,7 @@ class GroupController {
         description,
         groupType,
         settings,
+        privacy, // Include privacy setting
         admins: [req.student.id], // Automatically set the creator as an admin
       });
 
@@ -42,8 +51,7 @@ class GroupController {
     try {
       const group = await Group.findById(id)
         .populate("admins", "firstName lastName email")
-        .populate("members", "firstName lastName email")
-        .populate("resources");
+        .populate("members", "firstName lastName email");
 
       if (!group) {
         return res.status(404).json({ msg: "Group not found" });
@@ -61,12 +69,19 @@ class GroupController {
   // @access   Private (Admin)
   async updateGroup(req, res) {
     const { id } = req.params;
-    const { name, description, groupType, settings } = req.body;
+    const { name, description, groupType, settings, privacy } = req.body;
 
     // Validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Validate privacy setting if provided
+    if (privacy && !["public", "private"].includes(privacy)) {
+      return res
+        .status(400)
+        .json({ msg: "Privacy must be either public or private." });
     }
 
     try {
@@ -87,6 +102,7 @@ class GroupController {
       group.description = description || group.description;
       group.groupType = groupType || group.groupType;
       group.settings = settings || group.settings;
+      group.privacy = privacy || group.privacy; // Update privacy if provided
 
       await group.save();
       res.status(200).json({ msg: "Group updated successfully", group });
@@ -123,43 +139,6 @@ class GroupController {
     }
   }
 
-  // @route    POST /api/groups/:id/invite
-  // @desc     Regenerate invite code for the group
-  // @access   Private (Admin)
-  async regenerateInviteCode(req, res) {
-    const { id } = req.params;
-
-    try {
-      const group = await Group.findById(id);
-      if (!group) {
-        return res.status(404).json({ msg: "Group not found" });
-      }
-
-      // Check if the logged-in user is an admin of the group
-      if (!group.admins.includes(req.student.id)) {
-        return res
-          .status(403)
-          .json({ msg: "Access denied: You are not an admin" });
-      }
-
-      // Generate a new invite code
-      group.inviteCode = this.generateInviteCode();
-      await group.save();
-
-      res.status(200).json({
-        msg: "Invite code regenerated successfully",
-        inviteCode: group.inviteCode,
-      });
-    } catch (error) {
-      console.error("Error regenerating invite code:", error.message);
-      res.status(500).json({ msg: "Server Error", error: error.message });
-    }
-  }
-
-  // Generate a random invite code
-  generateInviteCode() {
-    return crypto.randomBytes(4).toString("hex"); // Generate a unique 8-character invite code
-  }
 
   // @route    GET /api/groups
   // @desc     Get all groups
